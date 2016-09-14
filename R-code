@@ -23,6 +23,7 @@ prob <- function(){
   
 }
 
+## Visualization (option 1)
 cnt <- c()
 total <- 1000
 for(k in 1:total) cnt = c(cnt, prob())
@@ -40,3 +41,25 @@ saveHTML({
     ani.pause(interval = 0.1)
   }
 },img.name = "brokenstick", htmlfile = "broken_stick.html")
+
+
+## Visualization (option 2)
+cnt <- c()
+
+total <- 1000
+
+for(k in 1:total) cnt = c(cnt, index_Score())
+
+df <- setNames(data.frame(1:total, rep(0, total)), c("Incrmt","Probs"))
+
+for (i in 1:total)  df$Probs[i] <- sum(cnt[1:i])/i
+
+for(i in 1:total) {
+  
+  sub_df <- subset(df, df$Incrmt <= i)
+  simul_plot <- qplot(Incrmt, Probs, data = sub_df, geom = "path") + 
+    labs(x = "iterations", y = "Probabilities", title = "Monte Carlo Simulation") + ylim(c(0,0.4)) + 
+    geom_hline(yintercept = 0.25, colour = "red", linetype = "longdash")
+  ggsave(plot = simul_plot, filename = paste(sprintf("images/brokenstick_%02d",i),".png", sep = ""), limitsize = FALSE)
+  dev.off()
+}
